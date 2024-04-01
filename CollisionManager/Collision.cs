@@ -45,7 +45,6 @@ namespace RevitToolKit.CollisionManager
         /// Initializes a new instance of the <see cref="Collision"/> class with the specified UIDocument, list of elements, and selection option.
         /// </summary>
         /// <param name="uidoc">The UIDocument representing the current Revit document.</param>
-        /// <param name="list">A list of elements to perform collision detection on. If null, all non-element type elements in the document will be considered.</param>
         /// <param name="selection">A boolean value indicating whether to perform element selection during collision detection.</param>
         public Collision(UIDocument uidoc, bool selection = false)
         {
@@ -57,6 +56,7 @@ namespace RevitToolKit.CollisionManager
         /// Performs collision detection based on the specified method and selects the resulting elements.
         /// </summary>
         /// <param name="method">The collision detection method. Possible methods are; <b>Intersection</b> or <b>Touching</b>.</param>
+        /// <param name="list">A list of elements to perform collision detection on. If null, all non-element type elements in the document will be considered.</param>
         /// <returns>A list of elements involved in the collision.</returns>
         public IList<Element> GetCollision(Method method, IList<Element> list = null)
         {
