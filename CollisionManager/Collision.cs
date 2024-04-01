@@ -47,11 +47,10 @@ namespace RevitToolKit.CollisionManager
         /// <param name="uidoc">The UIDocument representing the current Revit document.</param>
         /// <param name="list">A list of elements to perform collision detection on. If null, all non-element type elements in the document will be considered.</param>
         /// <param name="selection">A boolean value indicating whether to perform element selection during collision detection.</param>
-        public Collision(UIDocument uidoc, IList<Element> list = null, bool selection = false)
+        public Collision(UIDocument uidoc, bool selection = false)
         {
             UIDoc = uidoc;
             Selection = selection;
-            List = list is null ? new FilteredElementCollector(UIDoc.Document).WhereElementIsNotElementType().ToElements() : list;
         }
 
         /// <summary>
@@ -59,8 +58,9 @@ namespace RevitToolKit.CollisionManager
         /// </summary>
         /// <param name="method">The collision detection method. Possible methods are; <b>Intersection</b> or <b>Touching</b>.</param>
         /// <returns>A list of elements involved in the collision.</returns>
-        public IList<Element> GetCollision(Method method)
+        public IList<Element> GetCollision(Method method, IList<Element> list = null)
         {
+            List = list is null ? new FilteredElementCollector(UIDoc.Document).WhereElementIsNotElementType().ToElements() : list;
             var result = GetClash(method);
 
             if (Selection)
