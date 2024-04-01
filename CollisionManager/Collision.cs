@@ -39,16 +39,19 @@ namespace RevitToolKit.CollisionManager
     {
         private UIDocument UIDoc { get; }
         private bool Selection { get; set; }
+        private IList<Element> List { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Collision"/> class with the specified UIDocument and selection option.
+        /// Initializes a new instance of the <see cref="Collision"/> class with the specified UIDocument, list of elements, and selection option.
         /// </summary>
         /// <param name="uidoc">The UIDocument representing the current Revit document.</param>
+        /// <param name="list">A list of elements to perform collision detection on. If null, all non-element type elements in the document will be considered.</param>
         /// <param name="selection">A boolean value indicating whether to perform element selection during collision detection.</param>
-        public Collision(UIDocument uidoc, bool selection = false)
+        public Collision(UIDocument uidoc, IList<Element> list = null, bool selection = false)
         {
             UIDoc = uidoc;
             Selection = selection;
+            List = list is null ? new FilteredElementCollector(UIDoc.Document).WhereElementIsNotElementType().ToElements() : list;
         }
 
         /// <summary>
@@ -95,7 +98,7 @@ namespace RevitToolKit.CollisionManager
                     double sumFaces = Math.Abs(solid_a.Faces.Size + solid_b.Faces.Size);
                     double unionFaces = Math.Abs(unionSolid.Faces.Size);
 
-                    bool addToList; 
+                    bool addToList;
 
                     switch (method.Value)
                     {
@@ -125,19 +128,18 @@ namespace RevitToolKit.CollisionManager
         /// <returns>A list of tuples containing elements and their corresponding solids.</returns>
         private IList<Tuple<Element, Solid>> ProcessElements()
         {
-            IList<Tuple<Element, Solid>> list = new List<Tuple<Element, Solid>>();
-            var elements = new FilteredElementCollector(UIDoc.Document).WhereElementIsNotElementType().ToElements();
+            IList<Tuple<Element, Solid>> elements = new List<Tuple<Element, Solid>>();
 
-            foreach (var element in elements)
+            foreach (var element in List)
             {
                 var fullGeometry = element?.get_Geometry(new Options());
                 if (fullGeometry is null)
                     continue;
 
-                GetElementSolids(fullGeometry, element, list);
+                GetElementSolids(fullGeometry, element, elements);
             }
 
-            return list;
+            return elements;
         }
 
         /// <summary>
